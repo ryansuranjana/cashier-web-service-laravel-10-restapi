@@ -8,6 +8,7 @@ use App\Http\Resources\Category\CategoryResource;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
@@ -36,7 +37,34 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validate = Validator::make($request->all(), [
+                'name' => 'required|max:50|unique:categories,name',
+            ]);
+
+            if($validate->fails()) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'Bad Request',
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+
+            Category::create([
+                'name' => $request->input('name')
+            ]);
+
+            return response()->json([
+                'code' => 201,
+                'status' => 'Created',
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
