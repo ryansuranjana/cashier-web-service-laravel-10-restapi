@@ -105,7 +105,38 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        try {
+            $validate = Validator::make($request->all(), [
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'name' => 'required|max:100',
+                'role' => 'required'
+            ]);
+
+            if($validate->fails()) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'Bad Request',
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+
+            $user->update([
+                'email' => $request->input('email'),
+                'name' => $request->input('name'),
+                'role' => $request->input('role')
+            ]);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'OK',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
