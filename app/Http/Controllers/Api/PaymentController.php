@@ -102,7 +102,42 @@ class PaymentController extends Controller
      */
     public function update(Request $request, Payment $payment)
     {
-        //
+        try {
+            $validate = Validator::make($request->all(), [
+                'name' => 'required|max:50',
+                'type' => 'required|max:50',
+                'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:1024'
+            ]);
+
+            if($validate->fails()) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'Bad Request',
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+
+            $data = [
+                'name' => $request->input('name'),
+                'type' => $request->input('type'),
+            ];
+
+            if($request->hasFile('logo')) {
+                $data['logo'] = $request->file('logo')->store('payments_logo');
+            }
+            $payment->update($data);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'OK',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
