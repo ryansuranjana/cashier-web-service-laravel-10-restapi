@@ -8,6 +8,7 @@ use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -37,7 +38,40 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validate = Validator::make($request->all(), [
+                'email' => 'required|email|unique:users,email',
+                'name' => 'required|max:100',
+                'password' => 'required|min:8|max:16',
+                'role' => 'required'
+            ]);
+
+            if($validate->fails()) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'Bad Request',
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+
+            User::create([
+                'email' => $request->input('email'),
+                'name' => $request->input('name'),
+                'password' => bcrypt($request->input('password')),
+                'role' => $request->input('role')
+            ]);
+
+            return response()->json([
+                'code' => 201,
+                'status' => 'Created',
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -57,7 +91,7 @@ class UserController extends Controller
                 'status' => 'Not Found',
                 'error' => $e->getMessage()
             ], 404);
-        }catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
