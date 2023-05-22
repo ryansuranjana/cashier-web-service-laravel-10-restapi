@@ -18,7 +18,7 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::with(['orders'])->paginate(5);
+            $users = User::with(['orders'])->paginate(10);
             $response = new UserCollection($users);
             return $response->additional([
                 'code' => 200,
