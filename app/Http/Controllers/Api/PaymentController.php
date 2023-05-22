@@ -8,6 +8,7 @@ use App\Http\Resources\Payment\PaymentResource;
 use App\Models\Payment;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
@@ -36,7 +37,38 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validate = Validator::make($request->all(), [
+                'name' => 'required|max:50',
+                'type' => 'required|max:50',
+                'logo' => 'required|image|mimes:jpg,jpeg,png|max:1024'
+            ]);
+
+            if($validate->fails()) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'Bad Request',
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+
+            Payment::create([
+                'name' => $request->input('name'),
+                'type' => $request->input('type'),
+                'logo' => $request->file('logo')->store('payments_logo')
+            ]);
+
+            return response()->json([
+                'code' => 201,
+                'status' => 'Created',
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
