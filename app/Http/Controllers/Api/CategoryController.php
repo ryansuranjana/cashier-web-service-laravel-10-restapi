@@ -133,6 +133,18 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        try {
+            $category->delete();
+            return response()->json([
+                'code' => 200,
+                'status' => 'OK',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
