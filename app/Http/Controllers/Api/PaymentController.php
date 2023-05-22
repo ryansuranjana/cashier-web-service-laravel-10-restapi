@@ -8,6 +8,7 @@ use App\Http\Resources\Payment\PaymentResource;
 use App\Models\Payment;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
@@ -145,6 +146,20 @@ class PaymentController extends Controller
      */
     public function destroy(Payment $payment)
     {
-        //
+        try {
+            Storage::disk('public')->delete($payment->logo);
+            $payment->delete();
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'OK',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
