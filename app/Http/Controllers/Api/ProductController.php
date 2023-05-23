@@ -24,8 +24,8 @@ class ProductController extends Controller
             } else if($request->has('category')) {
                 $products = $products->where('category_id', $request->category);
             }
-            
-            $response = new ProductCollection($products->paginate(10));
+
+            $response = new ProductCollection($products->paginate(10)->appends($request->query()));
             return $response->additional([
                 'code' => 200,
                 'status' => 'OK'
