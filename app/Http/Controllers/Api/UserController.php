@@ -8,6 +8,7 @@ use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -39,6 +40,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
+            DB::beginTransaction();
             $validate = Validator::make($request->all(), [
                 'email' => 'required|email|unique:users,email',
                 'name' => 'required|max:100',
@@ -61,11 +63,13 @@ class UserController extends Controller
                 'role' => $request->input('role')
             ]);
 
+            DB::commit();
             return response()->json([
                 'code' => 201,
                 'status' => 'Created',
             ], 201);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
@@ -106,6 +110,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         try {
+            DB::beginTransaction();
             $validate = Validator::make($request->all(), [
                 'email' => 'required|email|unique:users,email,' . $user->id,
                 'name' => 'required|max:100',
@@ -126,11 +131,13 @@ class UserController extends Controller
                 'role' => $request->input('role')
             ]);
 
+            DB::commit();
             return response()->json([
                 'code' => 200,
                 'status' => 'OK',
             ], 200);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
@@ -145,12 +152,16 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
+            DB::beginTransaction();
             $user->delete();
+
+            DB::commit();
             return response()->json([
                 'code' => 200,
                 'status' => 'OK',
             ], 200);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',

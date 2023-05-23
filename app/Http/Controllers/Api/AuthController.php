@@ -14,36 +14,37 @@ class AuthController extends Controller
     {
         try {
             $validate = Validator::make($request->all(), [
-                'email' => ['required', 'email'],
-                'password' => ['required']
+                'email' => 'required|email',
+                'password' => 'required'
             ]);
 
             if ($validate->fails()) {
                 return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
+                    'code' => 400,
+                    'status' => 'Bad Request',
                     'errors' => $validate->errors()
                 ], 400);
             }
 
             if (!Auth::attempt($request->only(['email', 'password']))) {
                 return response()->json([
-                    'status' => false,
-                    'message' => 'Unauthorized.'
+                    'code' => 401,
+                    'status' => 'Unauthorized.'
                 ], 401);
             }
 
             $user = User::where('email', $request->email)->first();
             return response()->json([
-                'status' => true,
-                'message' => 'Successfully logged in.',
+                'code' => 200,
+                'status' => 'OK',
                 'data' => [
                     'token' => $user->createToken(str()->random(40), [$user->role])->plainTextToken
                 ]
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
-                'status' => false,
+                'code' => 500,
+                'status' => 'Internal Server Error',
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -53,8 +54,8 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json([
-            'status' => true,
-            'message' => 'Successfully logged out.'
-        ]);
+            'code' => 200,
+            'status' => 'OK',
+        ], 200);
     }
 }

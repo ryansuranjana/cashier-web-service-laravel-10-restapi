@@ -103,6 +103,7 @@ class OrderController extends Controller
                 'status' => 'Created'
             ], 201);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',

@@ -8,6 +8,7 @@ use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -49,6 +50,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
+            DB::beginTransaction();
             $validate = Validator::make($request->all(), [
                 'name' => 'required|max:100|unique:products,name',
                 'sku' => 'required|max:20|unique:products,sku',
@@ -75,11 +77,13 @@ class ProductController extends Controller
                 'category_id' => $request->input('category_id')
             ]);
 
+            DB::commit();
             return response()->json([
                 'code' => 201,
                 'status' => 'Created',
             ], 201);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
@@ -120,6 +124,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         try {
+            DB::beginTransaction();
             $validate = Validator::make($request->all(), [
                 'name' => 'required|max:100|unique:products,name,' . $product->id,
                 'sku' => 'required|max:20|unique:products,sku,' . $product->id,
@@ -151,11 +156,13 @@ class ProductController extends Controller
 
             $product->update($data);
 
+            DB::commit();
             return response()->json([
                 'code' => 200,
                 'status' => 'OK',
             ], 200);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
@@ -170,14 +177,17 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         try {
+            DB::beginTransaction();
             Storage::disk('public')->delete($product->image);
             $product->delete();
 
+            DB::commit();
             return response()->json([
                 'code' => 200,
                 'status' => 'OK',
             ], 200);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',

@@ -8,6 +8,7 @@ use App\Http\Resources\Payment\PaymentResource;
 use App\Models\Payment;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -39,6 +40,7 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         try {
+            DB::beginTransaction();
             $validate = Validator::make($request->all(), [
                 'name' => 'required|max:50',
                 'type' => 'required|max:50',
@@ -59,11 +61,13 @@ class PaymentController extends Controller
                 'logo' => $request->file('logo')->store('payments_logo')
             ]);
 
+            DB::commit();
             return response()->json([
                 'code' => 201,
                 'status' => 'Created',
             ], 201);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
@@ -104,6 +108,7 @@ class PaymentController extends Controller
     public function update(Request $request, Payment $payment)
     {
         try {
+            DB::beginTransaction();
             $validate = Validator::make($request->all(), [
                 'name' => 'required|max:50',
                 'type' => 'required|max:50',
@@ -128,11 +133,13 @@ class PaymentController extends Controller
             }
             $payment->update($data);
 
+            DB::commit();
             return response()->json([
                 'code' => 200,
                 'status' => 'OK',
             ], 200);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
@@ -147,14 +154,17 @@ class PaymentController extends Controller
     public function destroy(Payment $payment)
     {
         try {
+            DB::beginTransaction();
             Storage::disk('public')->delete($payment->logo);
             $payment->delete();
 
+            DB::commit();
             return response()->json([
                 'code' => 200,
                 'status' => 'OK',
             ], 200);
         } catch (\Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'Internal Server Error',
