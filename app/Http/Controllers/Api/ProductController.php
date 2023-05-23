@@ -8,6 +8,7 @@ use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -45,7 +46,44 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validate = Validator::make($request->all(), [
+                'name' => 'required|max:100|unique:products,name',
+                'sku' => 'required|max:20|unique:products,sku',
+                'stock' => 'required|integer',
+                'price' => 'required|integer',
+                'image' => 'required|image|mimes:jpg,jpeg,png|max:1024',
+                'category_id' => 'required'
+            ]);
+
+            if($validate->fails()) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'Bad Request',
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+
+            Product::create([
+                'name' => $request->input('name'),
+                'sku' => $request->input('sku'),
+                'stock' => $request->input('stock'),
+                'price' => $request->input('price'),
+                'image' => $request->file('image')->store('products_image'),
+                'category_id' => $request->input('category_id')
+            ]);
+
+            return response()->json([
+                'code' => 201,
+                'status' => 'Created',
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
