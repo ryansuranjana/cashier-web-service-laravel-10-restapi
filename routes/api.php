@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
@@ -35,4 +36,5 @@ Route::middleware('auth:sanctum')->group(function() {
     });
     Route::apiResource('/products', ProductController::class)->only(['index', 'show']);
 });
+Route::apiResource('/orders', OrderController::class);
 
