@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Order\OrderCollection;
+use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -46,9 +48,27 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show($id)
     {
-        //
+        try {
+            $response = new OrderResource(Order::findOrFail($id));
+            return $response->additional([
+                'code' => 200,
+                'status' => 'OK'
+            ]);
+        } catch(ModelNotFoundException $e) {
+            return response()->json([
+                'code' => 404,
+                'status' => 'Not Found',
+                'error' => $e->getMessage()
+            ], 404);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
