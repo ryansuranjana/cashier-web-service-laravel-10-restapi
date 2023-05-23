@@ -12,11 +12,20 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $categories = Product::paginate(10);
-            $response = new ProductCollection($categories);
+            $products = Product::with(['category']);
+
+            if($request->has(['category', 'name'])) {
+                $products = $products->where('category_id', $request->category)->where('name', $request->name);
+            } else if($request->has('name')) {
+                $products = $products->where('name', $request->name);
+            } else if($request->has('category')) {
+                $products = $products->where('category_id', $request->category);
+            }
+            
+            $response = new ProductCollection($products->paginate(10));
             return $response->additional([
                 'code' => 200,
                 'status' => 'OK'
