@@ -37,7 +37,8 @@ class ProductController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'code' => 500,
-                'status' => 'Internal Server Error'
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
