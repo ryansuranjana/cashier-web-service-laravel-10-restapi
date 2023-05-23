@@ -117,7 +117,49 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        try {
+            $validate = Validator::make($request->all(), [
+                'name' => 'required|max:100|unique:products,name,' . $product->id,
+                'sku' => 'required|max:20|unique:products,sku,' . $product->id,
+                'stock' => 'required|integer',
+                'price' => 'required|integer',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
+                'category_id' => 'required'
+            ]);
+
+            if($validate->fails()) {
+                return response()->json([
+                    'code' => 400,
+                    'status' => 'Bad Request',
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+
+            $data = [
+                'name' => $request->input('name'),
+                'sku' => $request->input('sku'),
+                'stock' => $request->input('stock'),
+                'price' => $request->input('price'),
+                'category_id' => $request->input('category_id')
+            ];
+
+            if($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('products_image');
+            }
+
+            $product->update($data);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'OK',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
