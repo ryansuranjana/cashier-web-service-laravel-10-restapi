@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id');
             $table->foreignId('payment_type_id');
-            $table->string('name');
             $table->string('total_price');
             $table->string('total_paid');
             $table->string('total_return');
