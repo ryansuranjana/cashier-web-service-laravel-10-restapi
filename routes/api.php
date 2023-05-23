@@ -35,6 +35,6 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::apiResource('/products', ProductController::class);
     });
     Route::apiResource('/products', ProductController::class)->only(['index', 'show']);
-    Route::apiResource('/orders', OrderController::class);
+    Route::apiResource('/orders', OrderController::class)->only(['index', 'show', 'store']);
 });
 
