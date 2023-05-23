@@ -8,6 +8,7 @@ use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -20,11 +21,11 @@ class ProductController extends Controller
         try {
             $products = Product::with(['category']);
 
-            if($request->has(['category', 'name'])) {
+            if ($request->has(['category', 'name'])) {
                 $products = $products->where('category_id', $request->category)->where('name', $request->name);
-            } else if($request->has('name')) {
+            } else if ($request->has('name')) {
                 $products = $products->where('name', $request->name);
-            } else if($request->has('category')) {
+            } else if ($request->has('category')) {
                 $products = $products->where('category_id', $request->category);
             }
 
@@ -56,7 +57,7 @@ class ProductController extends Controller
                 'category_id' => 'required'
             ]);
 
-            if($validate->fails()) {
+            if ($validate->fails()) {
                 return response()->json([
                     'code' => 400,
                     'status' => 'Bad Request',
@@ -97,7 +98,7 @@ class ProductController extends Controller
                 'code' => 200,
                 'status' => 'OK'
             ]);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'code' => 404,
                 'status' => 'Not Found',
@@ -127,7 +128,7 @@ class ProductController extends Controller
                 'category_id' => 'required'
             ]);
 
-            if($validate->fails()) {
+            if ($validate->fails()) {
                 return response()->json([
                     'code' => 400,
                     'status' => 'Bad Request',
@@ -143,7 +144,7 @@ class ProductController extends Controller
                 'category_id' => $request->input('category_id')
             ];
 
-            if($request->hasFile('image')) {
+            if ($request->hasFile('image')) {
                 $data['image'] = $request->file('image')->store('products_image');
             }
 
@@ -167,6 +168,20 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        try {
+            Storage::disk('public')->delete($product->image);
+            $product->delete();
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'OK',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
