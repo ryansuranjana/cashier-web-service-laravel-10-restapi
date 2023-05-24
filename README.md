@@ -1,66 +1,245 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Cashier Web Service RestfulAPI
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Description
+Cashier Web Service RestfulAPI is an API that provides various endpoints for managing users, categories, payments, products, and orders. It supports authentication and authorization using bearer tokens.
 
-## About Laravel
+## Features
+- Authentication
+- CRUD operations for User
+- CRUD operations for Category
+- CRUD operations for Payment
+- CRUD operations for Product
+- Order Management
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## API Reference
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Authentication
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+#### Login user `/api/login`
+- Method: POST
+- Body request JSON:
+  | Field    | Type   | Required | Description                   |
+  | -------- | ------ | -------- | ----------------------------- |
+  | email    | string | yes      | User's email                  |
+  | password | string | yes      | User's password (min 8 chars) |
 
-## Learning Laravel
+#### Logout user `/api/logout`
+- Method: POST
+- Requires bearer token
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### User Management
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+#### List users `/api/users`
+- Method: GET
+- Requires bearer token (Role: Admin)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+#### Detail user `/api/users/{id}`
+- Method: GET
+- Requires bearer token (Role: Admin)
 
-## Laravel Sponsors
+#### Create user `/api/users`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field    | Type   | Required | Description                              |
+  | -------- | ------ | -------- | ---------------------------------------- |
+  | email    | string | yes      | User's email                             |
+  | password | string | yes      | User's password (min 8 and max 16 chars) |
+  | name     | string | yes      | User's name                              |
+  | role     | string | yes      | User's role (enum: admin, cashier)        |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+#### Update user `/api/users/{id}`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field    | Type   | Required | Description                              |
+  | -------- | ------ | -------- | ---------------------------------------- |
+  | email    | string | yes      | User's email                             |
+  | password | string | yes      | User's password (min 8 and max 16 chars) |
+  | name     | string | yes      | User's name                              |
+  | role     | string | yes      | User's role (enum: admin, cashier)        |
+  | _method  | string | yes      | Value: `PUT` to specify the update method|
 
-### Premium Partners
+#### Delete user `/api/users/{id}`
+- Method: DELETE
+- Requires bearer token (Role: Admin)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### Payment Management
 
-## Contributing
+#### List payments `/api/payments`
+- Method: GET
+- Requires bearer token (Role: Admin)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Detail payment `/api/payments/{id}`
+- Method: GET
+- Requires bearer token (Role: Admin)
 
-## Code of Conduct
+#### Create payment `/api/payments`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field | Type   | Required | Description                                    |
+  | ----- | ------ | -------- | ---------------------------------------------- |
+  | name  | string | yes      | Payment name                                   |
+  | type  | string | yes      | Payment type                                   |
+  | logo  | file   | yes      | Payment logo (image/jpeg, image/png, image/jpg, max 1024mb) |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### Edit payment `/api/payments/{id}`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field    | Type   | Required | Description                                    |
+  | -------- | ------ | -------- | ---------------------------------------------- |
+  | name     | string | yes      | Payment name                                   |
+  | type     | string | yes      | Payment type                                   |
+  | logo     | file   | no       | Payment logo (image/jpeg, image/png, image/jpg, max 1024mb) |
+  | _method  | string | yes      | Value: `PUT` to specify the update method      |
 
-## Security Vulnerabilities
+#### Delete payment `/api/payments/{id}`
+- Method: DELETE
+- Requires bearer token (Role: Admin)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Category Management
 
-## License
+#### List categories `/api/categories`
+- Method: GET
+- Requires bearer token (Role: Admin)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+#### Detail category `/api/categories/{id}`
+- Method: GET
+- Requires bearer token (Role: Admin)
+
+#### Create category `/api/categories`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field | Type   | Required | Description            |
+  | ----- | ------ | -------- | ---------------------- |
+  | name  | string | yes      | Category name           |
+
+#### Update category `/api/categories/{id}`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field    | Type   | Required | Description            |
+  | -------- | ------ | -------- | ---------------------- |
+  | name     | string | yes      | Category name           |
+  | _method  | string | yes      | Value: `PUT` to specify the update method |
+
+#### Delete category `/api/categories/{id}`
+- Method: DELETE
+- Requires bearer token (Role: Admin)
+
+### Product Management
+
+#### List products `/api/products`
+- Method: GET
+- Requires bearer token (Role: Admin, Cashier)
+- Query parameters:
+  - name: string (product name)
+  - category: string (category name)
+
+#### Detail product `/api/products/{id}`
+- Method: GET
+- Requires bearer token (Role: Admin, Cashier)
+
+#### Create product `/api/products`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field       | Type    | Required | Description                                                 |
+  | ----------- | ------- | -------- | ----------------------------------------------------------- |
+  | name        | string  | yes      | Product name                                                |
+  | category_id | integer | yes      | Category ID                                                 |
+  | price       | integer | yes      | Product price                                               |
+  | stock       | integer | yes      | Product stock                                               |
+  | sku         | string  | yes      | Product SKU                                                 |
+  | image       | file    | yes      | Product image (image/jpeg, image/png, image/jpg, max 1024mb) |
+
+#### Update product `/api/products/{id}`
+- Method: POST
+- Requires bearer token (Role: Admin)
+- Body request JSON:
+  | Field       | Type    | Required | Description                                                 |
+  | ----------- | ------- | -------- | ----------------------------------------------------------- |
+  | name        | string  | yes      | Product name                                                |
+  | category_id | integer | yes      | Category ID                                                 |
+  | price       | integer | yes      | Product price                                               |
+  | stock       | integer | yes      | Product stock                                               |
+  | sku         | string  | yes      | Product SKU                                                 |
+  | image       | file    | no       | Product image (image/jpeg, image/png, image/jpg, max 1024mb) |
+  | _method     | string  | yes      | Value: `PUT` to specify the update method                   |
+
+#### Delete product `/api/products/{id}`
+- Method: DELETE
+- Requires bearer token (Role: Admin)
+
+### Order Management
+
+#### List orders `/api/orders`
+- Method: GET
+- Requires bearer token (Role: Admin, Cashier)
+
+#### Detail order `/api/orders/{id}`
+- Method: GET
+- Requires bearer token (Role: Admin, Cashier)
+
+#### Create order `/api/orders`
+- Method: POST
+- Requires bearer token (Role: Admin, Cashier)
+- Body request JSON:
+  | Field       | Type    | Required | Description                                                 |
+  | ----------- | ------- | -------- | ----------------------------------------------------------- |
+  | payment_id  | integer | yes      | Payment ID                                                  |
+  | total_paid  | integer | yes      | Total amount paid                                           |
+  | products    | array   |          | Array of products, each item contains product_id and qty     |
+  
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://link-to-project cashier-web-service
+```
+
+Go to the project directory
+
+```bash
+  cd cashier-web-service
+```
+
+Install dependencies
+
+```bash
+  composer install
+```
+
+Copy .env.example to .env
+
+```bash
+  cp .env.example .env
+```
+
+Generate App key
+
+```bash
+  php artisan key:generate
+```
+
+Migrate the database, make sure the database settings are in .env before migrating
+
+```bash
+  php artisan migrate
+```
+
+[Optional]: Seed the database
+
+```bash
+  php artisan db:seed
+```
+
+Start the server
+
+```bash
+  php artisan serve
+```
