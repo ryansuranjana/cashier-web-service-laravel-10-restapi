@@ -199,8 +199,15 @@ Cashier Web Service RestfulAPI is an API that provides various endpoints for man
 Clone the project
 
 ```bash
-  git clone https://link-to-project cashier-web-service
+  git clone https://github.com/ryansuranjana/cashier-web-service-laravel-10-restapi.git cashier-web-service
 ```
+
+or
+
+```bash
+  git clone https://github.com/ryansuranjana/cashier-web-service-laravel-10-restapi.git cashier-web-service
+```
+
 
 Go to the project directory
 
