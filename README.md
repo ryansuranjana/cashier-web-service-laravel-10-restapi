@@ -205,7 +205,7 @@ Clone the project
 or
 
 ```bash
-  git clone https://github.com/ryansuranjana/cashier-web-service-laravel-10-restapi.git cashier-web-service
+  git clone git@github.com:ryansuranjana/cashier-web-service-laravel-10-restapi.git cashier-web-service
 ```
 
 
