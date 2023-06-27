@@ -38,7 +38,8 @@ class AuthController extends Controller
                 'code' => 200,
                 'status' => 'OK',
                 'data' => [
-                    'token' => $user->createToken(str()->random(40), [$user->role])->plainTextToken
+                    'token' => $user->createToken(str()->random(40), [$user->role])->plainTextToken,
+                    'user' => $user
                 ]
             ], 200);
         } catch (\Throwable $e) {
